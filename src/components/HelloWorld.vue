@@ -25,20 +25,44 @@
     </select>
     <button>Roll</button>
   </dialog>
+
+  <h1>Chat</h1>
+  <button @click="joinChat">join chat</button>
+
+  message array !!!! {{ messageArray }}
+  <div v-for="(message, i) in messageArray" :key="i">
+    {{ i }} : Last message: {{ message }}
+  </div>
   <div v-if="displayModal" class="hider" />
 </template>
 
 <script setup lang="ts">
+  import { io } from 'socket.io-client';
   import { ref } from 'vue';
 
   const lastDice = ref();
   const displayModal = ref();
+  const messageArray = ref<any>([]);
+  const connected = ref(false);
+  const socketioInstance = ref();
 
   const rollDice = (num: number) => {
     lastDice.value = Math.floor(Math.random() * num + 1);
+
+    messageArray.value.push(lastDice.value);
+    socketioInstance.value.emit('message', lastDice.value);
   };
   const displayDiceModal = () => {
     displayModal.value = true;
+  };
+  const joinChat = () => {
+    if (!connected.value) {
+      socketioInstance.value = io('http://localhost:3000');
+      connected.value = true;
+    }
+    socketioInstance.value.on('message:received', (data: string) => {
+      messageArray.value.push(data);
+    });
   };
 </script>
 

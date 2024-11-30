@@ -2,6 +2,8 @@
 
 A helper for role players
 
+Need to join before any interaction
+
 ## Project setup
 
 ```
